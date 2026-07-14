@@ -1,6 +1,8 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useStore } from '@/store/useStore'
+import { verifyToken } from '@/lib/activation'
 import Toolbar from '@/components/Toolbar'
 import Editor from '@/components/Editor'
 import Preview from '@/components/Preview'
@@ -15,6 +17,19 @@ import Footer from '@/components/Footer'
 export default function Home() {
   const themeId = useStore((s) => s.themeId)
   const isDark = themeId === 'mu-se'
+  const isPro = useStore((s) => s.isPro)
+  const proToken = useStore((s) => s.proToken)
+  const setPro = useStore((s) => s.setPro)
+
+  useEffect(() => {
+    if (isPro && proToken) {
+      verifyToken(proToken).then((valid) => {
+        if (!valid) {
+          setPro(false)
+        }
+      })
+    }
+  }, [])
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">

@@ -1,0 +1,11 @@
+name = "public-typesetting-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+kv_namespaces = [
+  { binding = "ACTIVATION_KV", id = "733aeef51e9c485e8cd9e4da1a406340" }
+]
+
+[vars]
+SECRET_KEY = "ts2024_secret_key_v1_x9m3k7p2"

@@ -42,6 +42,7 @@ export const useStore = create<AppState>()(
         themeId: 'mo-yun',
         isPro: false,
         activationCode: '',
+        proToken: '',
         articles: defaultArticles,
         currentArticleId: defaultArticle.id,
         wordCount: 0,
@@ -75,6 +76,7 @@ export const useStore = create<AppState>()(
 
         setPro: (isPro) => set({ isPro }),
         setActivationCode: (code) => set({ activationCode: code }),
+        setProToken: (token) => set({ proToken: token }),
 
         createArticle: (title) => {
           const article: Article = {
@@ -224,6 +226,7 @@ export const useStore = create<AppState>()(
         currentArticleId: state.currentArticleId,
         isPro: state.isPro,
         activationCode: state.activationCode,
+        proToken: state.proToken,
         apiKey: state.apiKey,
         useOwnApi: state.useOwnApi,
         customCSS: state.customCSS,

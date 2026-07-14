@@ -2,29 +2,48 @@
 
 import { useState } from 'react'
 import { useStore } from '@/store/useStore'
-import { validateActivationCode } from '@/lib/utils'
+import { activateCode } from '@/lib/activation'
 
 export default function PayWall() {
   const show = useStore((s) => s.showPayWall)
   const setShow = useStore((s) => s.setShowPayWall)
   const setPro = useStore((s) => s.setPro)
   const setActivationCode = useStore((s) => s.setActivationCode)
+  const setProToken = useStore((s) => s.setProToken)
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   if (!show) return null
 
-  const handleActivate = () => {
-    if (validateActivationCode(code)) {
-      setPro(true)
-      setActivationCode(code)
-      setSuccess(true)
-      setError('')
-      setTimeout(() => setShow(false), 1500)
-    } else {
-      setError('激活码无效，请检查后重试')
-      setSuccess(false)
+  const handleActivate = async () => {
+    if (!code.trim()) {
+      setError('请输入激活码')
+      return
+    }
+
+    setLoading(true)
+    setError('')
+
+    try {
+      const result = await activateCode(code)
+      if (result.success) {
+        setPro(true)
+        setActivationCode(code.toUpperCase().trim())
+        if (result.token) {
+          setProToken(result.token)
+        }
+        setSuccess(true)
+        setTimeout(() => setShow(false), 2000)
+      } else {
+        setError(result.message || '激活码无效')
+        setSuccess(false)
+      }
+    } catch {
+      setError('网络错误，请稍后重试')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -50,7 +69,7 @@ export default function PayWall() {
                 <span className="text-green-500">✓</span> 全部 5 种精美主题
               </li>
               <li className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> AI 智能排版（100次）
+                <span className="text-green-500">✓</span> AI 智能排版
               </li>
               <li className="flex items-center gap-2">
                 <span className="text-green-500">✓</span> 导出高清长图
@@ -61,15 +80,12 @@ export default function PayWall() {
               <li className="flex items-center gap-2">
                 <span className="text-green-500">✓</span> 历史版本管理
               </li>
-              <li className="flex items-center gap-2">
-                <span className="text-green-500">✓</span> 批量导入 .md 文件
-              </li>
             </ul>
           </div>
 
           <div className="border-t pt-4">
             <p className="text-sm font-medium text-gray-700 mb-3">
-              方式一：扫码支付（微信/支付宝），付款后联系客服获取激活码
+              方式一：扫码支付后联系客服获取激活码
             </p>
             <div className="flex gap-4 justify-center">
               <div className="text-center">
@@ -128,9 +144,10 @@ export default function PayWall() {
               />
               <button
                 onClick={handleActivate}
-                className="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm hover:bg-amber-600"
+                disabled={loading}
+                className="px-4 py-2 bg-amber-500 text-white rounded-lg text-sm hover:bg-amber-600 disabled:bg-gray-400"
               >
-                激活
+                {loading ? '验证中...' : '激活'}
               </button>
             </div>
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
@@ -138,7 +155,10 @@ export default function PayWall() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
                 <p className="text-sm text-green-600 font-medium">激活成功！PRO 功能已解锁</p>
                 <p className="text-xs text-green-500 mt-1">
-                  请牢记激活码 <strong className="text-green-700">{code}</strong>，更换设备或清除缓存后可重新输入恢复权限
+                  请在 <strong className="text-green-700">{code.toUpperCase()}</strong>，更换设备或清除缓存后可重新输入恢复权限
+                </p>
+                <p className="text-xs text-amber-600 mt-1">
+                  提示：每个激活码仅绑定一个设备，请勿外泄
                 </p>
               </div>
             )}

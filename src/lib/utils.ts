@@ -27,21 +27,3 @@ export async function copyRichText(html: string) {
   })
   await navigator.clipboard.write([clipboardItem])
 }
-
-export function getActivationCodes(): string[] {
-  return [
-    'TYPESET2024',
-    'PAIBAN888',
-    'PRO8888',
-    'WRITER666',
-    'CODE2024',
-    'AI2024VIP',
-    'PRO2024ZX',
-    'VIP8888',
-  ]
-}
-
-export function validateActivationCode(code: string): boolean {
-  const codes = getActivationCodes()
-  return codes.includes(code.toUpperCase().trim())
-}

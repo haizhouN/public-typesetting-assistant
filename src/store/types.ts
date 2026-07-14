@@ -19,6 +19,7 @@ export interface AppState {
   themeId: string
   isPro: boolean
   activationCode: string
+  proToken: string
   articles: Article[]
   currentArticleId: string | null
   wordCount: number
@@ -39,6 +40,7 @@ export interface AppState {
   setTheme: (themeId: string) => void
   setPro: (isPro: boolean) => void
   setActivationCode: (code: string) => void
+  setProToken: (token: string) => void
 
   createArticle: (title: string) => void
   loadArticle: (id: string) => void
