@@ -69,14 +69,45 @@ export default function PayWall() {
 
           <div className="border-t pt-4">
             <p className="text-sm font-medium text-gray-700 mb-3">
-              方式一：扫码支付（微信/支付宝），付款后将自动获取激活码
+              方式一：扫码支付（微信/支付宝），付款后联系客服获取激活码
             </p>
-            <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <div className="w-32 h-32 mx-auto bg-gray-200 rounded-lg flex items-center justify-center text-gray-400 text-xs">
-                收款码占位
+            <div className="flex gap-4 justify-center">
+              <div className="text-center">
+                <div className="w-36 h-36 mx-auto rounded-lg overflow-hidden border-2 border-green-200 flex items-center justify-center">
+                  <img
+                    src="/wechat-pay.png"
+                    alt="微信支付"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                      const parent = (e.target as HTMLImageElement).parentElement
+                      if (parent) {
+                        parent.innerHTML = '<span class="text-xs text-gray-400">将微信收款码放到<br/>public/wechat-pay.png</span>'
+                      }
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-green-600 mt-1 font-medium">微信支付</p>
               </div>
-              <p className="text-xs text-gray-400 mt-2">付款后联系客服获取激活码</p>
+              <div className="text-center">
+                <div className="w-36 h-36 mx-auto rounded-lg overflow-hidden border-2 border-blue-200 flex items-center justify-center">
+                  <img
+                    src="/alipay.png"
+                    alt="支付宝"
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none'
+                      const parent = (e.target as HTMLImageElement).parentElement
+                      if (parent) {
+                        parent.innerHTML = '<span class="text-xs text-gray-400">将支付宝收款码放到<br/>public/alipay.png</span>'
+                      }
+                    }}
+                  />
+                </div>
+                <p className="text-xs text-blue-600 mt-1 font-medium">支付宝</p>
+              </div>
             </div>
+            <p className="text-xs text-gray-400 mt-3 text-center">付款后联系客服获取激活码</p>
           </div>
 
           <div className="border-t pt-4">
@@ -103,7 +134,14 @@ export default function PayWall() {
               </button>
             </div>
             {error && <p className="text-sm text-red-500 mt-2">{error}</p>}
-            {success && <p className="text-sm text-green-500 mt-2">激活成功！享受 PRO 功能</p>}
+            {success && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
+                <p className="text-sm text-green-600 font-medium">激活成功！PRO 功能已解锁</p>
+                <p className="text-xs text-green-500 mt-1">
+                  请牢记激活码 <strong className="text-green-700">{code}</strong>，更换设备或清除缓存后可重新输入恢复权限
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
