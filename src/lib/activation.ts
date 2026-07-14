@@ -38,4 +38,14 @@ export async function verifyToken(token: string): Promise<boolean> {
   }
 }
 
+export async function claimCode(): Promise<{ success: boolean; code?: string; token?: string; message: string }> {
+  const deviceId = getDeviceId()
+  const response = await fetch(`${API_BASE}/claim`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ deviceId }),
+  })
+  return response.json()
+}
+
 export { getDeviceId }

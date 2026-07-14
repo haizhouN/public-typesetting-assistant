@@ -8,6 +8,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands'
 import { oneDark } from '@codemirror/theme-one-dark'
 import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 import { useStore } from '@/store/useStore'
+import { htmlToMarkdown } from '@/lib/import'
 
 interface EditorProps {
   isDark: boolean
@@ -43,8 +44,26 @@ export default function Editor({ isDark }: EditorProps) {
       history(),
       syntaxHighlighting(defaultHighlightStyle),
       keymap.of([...defaultKeymap, ...historyKeymap]),
-      placeholder('在这里输入 Markdown 内容...'),
+      placeholder('输入 Markdown 或粘贴纯文本/Word内容...'),
       EditorView.lineWrapping,
+      EditorView.domEventHandlers({
+        paste: (event, view) => {
+          const clipboardData = event.clipboardData
+          if (!clipboardData) return false
+
+          const html = clipboardData.getData('text/html')
+          if (html) {
+            event.preventDefault()
+            const markdown = htmlToMarkdown(html)
+            const { from, to } = view.state.selection.main
+            view.dispatch({
+              changes: { from, to, insert: markdown },
+            })
+            return true
+          }
+          return false
+        },
+      }),
       updateListener,
     ]
 

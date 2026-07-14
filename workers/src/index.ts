@@ -20,6 +20,10 @@ export default {
       return handleVerify(request, env, corsHeaders)
     }
 
+    if (url.pathname === '/claim' && request.method === 'POST') {
+      return handleClaim(request, env, corsHeaders)
+    }
+
     return new Response(JSON.stringify({ error: 'Not found' }), {
       status: 404,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -106,6 +110,41 @@ async function handleVerify(request: Request, env: Env, headers: Record<string, 
     return json({ success: true }, 200, headers)
   } catch {
     return json({ success: false }, 200, headers)
+  }
+}
+
+async function handleClaim(request: Request, env: Env, headers: Record<string, string>): Promise<Response> {
+  try {
+    const { deviceId } = await request.json() as { deviceId: string }
+
+    if (!deviceId) {
+      return json({ success: false, error: '缺少参数' }, 400, headers)
+    }
+
+    const poolData = await env.ACTIVATION_KV.get('codes:pool')
+    if (!poolData) {
+      return json({ success: false, error: '暂无可用激活码' }, 200, headers)
+    }
+
+    const pool: string[] = JSON.parse(poolData)
+    if (pool.length === 0) {
+      return json({ success: false, error: '激活码已领完' }, 200, headers)
+    }
+
+    const code = pool.shift()!
+
+    await env.ACTIVATION_KV.put('codes:pool', JSON.stringify(pool))
+
+    await env.ACTIVATION_KV.put(`code:${code}`, JSON.stringify({
+      used: true,
+      deviceId,
+      activatedAt: Date.now(),
+    }))
+
+    const token = await generateToken(deviceId, code, env.SECRET_KEY)
+    return json({ success: true, code, token, message: '领取成功' }, 200, headers)
+  } catch {
+    return json({ success: false, error: '服务器错误' }, 500, headers)
   }
 }
 

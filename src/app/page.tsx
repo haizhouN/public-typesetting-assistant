@@ -32,14 +32,31 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="h-screen flex flex-col bg-slate-100">
       <Toolbar />
-      <div className="flex-1 flex overflow-hidden">
-        <div className="w-1/2 border-r bg-white">
-          <Editor isDark={isDark} />
+      <div className="flex-1 flex overflow-hidden p-3 gap-3">
+        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+          <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-100 flex items-center">
+            <span className="text-xs text-gray-500 font-medium">编辑器</span>
+            <span className="text-xs text-gray-300 ml-2">支持 Markdown / Word / 纯文本</span>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <Editor isDark={isDark} />
+          </div>
         </div>
-        <div className="w-1/2">
-          <Preview />
+
+        <div className="hidden md:block w-px bg-gray-200 self-stretch mx-0" />
+
+        <div className="flex-1 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden flex flex-col">
+          <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-100 flex items-center justify-between">
+            <span className="text-xs text-gray-500 font-medium">公众号预览</span>
+            <div className="flex items-center gap-2">
+              <ExportImage />
+            </div>
+          </div>
+          <div className="flex-1 overflow-hidden">
+            <Preview />
+          </div>
         </div>
       </div>
       <Footer />
@@ -49,10 +66,6 @@ export default function Home() {
       <AISettingsPanel />
       <CustomCSSPanel />
       <PayWall />
-
-      <div className="fixed bottom-6 right-6 z-40">
-        <ExportImage />
-      </div>
     </div>
   )
 }

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useStore } from '@/store/useStore'
-import { activateCode } from '@/lib/activation'
+import { activateCode, claimCode } from '@/lib/activation'
 
 export default function PayWall() {
   const show = useStore((s) => s.showPayWall)
@@ -14,6 +14,8 @@ export default function PayWall() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [claiming, setClaiming] = useState(false)
+  const [claimedCode, setClaimedCode] = useState('')
 
   if (!show) return null
 
@@ -44,6 +46,28 @@ export default function PayWall() {
       setError('网络错误，请稍后重试')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const handleClaim = async () => {
+    setClaiming(true)
+    setError('')
+
+    try {
+      const result = await claimCode()
+      if (result.success && result.code && result.token) {
+        setPro(true)
+        setActivationCode(result.code)
+        setProToken(result.token)
+        setClaimedCode(result.code)
+        setSuccess(true)
+      } else {
+        setError(result.message || '领取失败，请稍后重试')
+      }
+    } catch {
+      setError('网络错误，请稍后重试')
+    } finally {
+      setClaiming(false)
     }
   }
 
@@ -123,7 +147,27 @@ export default function PayWall() {
                 <p className="text-xs text-blue-600 mt-1 font-medium">支付宝</p>
               </div>
             </div>
-            <p className="text-xs text-gray-400 mt-3 text-center">付款后联系客服获取激活码</p>
+            <p className="text-xs text-gray-400 mt-3 text-center">支付后点击下方按钮自动获取激活码</p>
+
+            {claimedCode ? (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-3 text-center">
+                <p className="text-sm text-green-700 font-medium">你的激活码</p>
+                <p className="text-xl font-bold text-green-800 tracking-wider mt-1">{claimedCode}</p>
+                <p className="text-xs text-green-600 mt-1">已自动激活，请牢记此码</p>
+              </div>
+            ) : (
+              <button
+                onClick={handleClaim}
+                disabled={claiming}
+                className="w-full mt-3 py-2.5 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-lg font-medium text-sm hover:from-green-600 hover:to-emerald-700 disabled:bg-gray-400 transition"
+              >
+                {claiming ? '正在获取...' : '我已付款，获取激活码'}
+              </button>
+            )}
+
+            <p className="text-xs text-gray-300 mt-2 text-center">
+              请诚信付款，支持创作者继续维护
+            </p>
           </div>
 
           <div className="border-t pt-4">
